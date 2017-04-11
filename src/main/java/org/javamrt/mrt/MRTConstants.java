@@ -164,8 +164,6 @@ public class MRTConstants {
 		new SimpleDateFormat("MM/dd/yy HH:mm:ss");
 
 	/**
-	 *
-	 * @param InetAddress ia
 	 * @return Textual representation of the InetAddress
 	 *
 	 * for all addresses, removes initial name

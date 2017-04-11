@@ -29,7 +29,6 @@ public class Common {
 	 * Calculate the timestamp for the beginning of month before <i>time</i> <br>
 	 * if <i>time</i> is the beginning of month, return it.
 	 *
-	 * @param time
 	 * @return timestamp of beginning of the month before <i>time</i>
 	 */
 	public static long beginMonth(long time) {
@@ -46,7 +45,6 @@ public class Common {
 	 * Calculate the timestamp of the midnight before <i>time</i> <br>
 	 * If <i>time</i> is the midnight, return it.
 	 *
-	 * @param time
 	 * @return timestamp of the midnight before <i>time</i>
 	 */
 	public static long midNight(long time) {
@@ -60,9 +58,6 @@ public class Common {
 
 	/**
 	 * Calculate the timestamp for the beginning of hour
-	 *
-	 * @param time
-	 * @return
 	 */
 	public static long startHour(long time) {
 		cal.setTimeInMillis(time * 1000L);
@@ -73,8 +68,6 @@ public class Common {
 	}
 
 	/**
-	 *
-	 * @param time
 	 * @return the seconds since the start of hour; <br>
 	 *         for hh:00:00, return 0
 	 */
@@ -83,8 +76,6 @@ public class Common {
 	}
 
 	/**
-	 *
-	 * @param time
 	 * @return the seconds since midnight of the day;<br>
 	 *         if time is midnight, return 0
 	 */
@@ -93,8 +84,6 @@ public class Common {
 	}
 
 	/**
-	 *
-	 * @param time
 	 * @return the seconds since midnight of the day;<br>
 	 *         if time is midnight, return 0
 	 */
@@ -104,7 +93,6 @@ public class Common {
 
 	/**
 	 * returns a string with the UTC time (hour,min,day,month,year)
-	 * @param utcTime
 	 * @return HH:MM DD-MM-YYYY
 	 */
 	public static String UTCTime(long utcTime) {

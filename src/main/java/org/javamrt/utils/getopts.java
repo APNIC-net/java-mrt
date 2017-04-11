@@ -153,10 +153,9 @@ public class getopts {
 		return 0;
 	}
 
-/**
- * for convenience: try to parse optarg into an integer
- * @return
- */
+	/**
+	 * for convenience: try to parse optarg into an integer
+	 */
 	public int optarg() {
 		return Integer.parseInt(this.optarg);
 	}

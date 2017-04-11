@@ -6,10 +6,10 @@
 
 package org.javamrt.mrt;
 
+import org.javamrt.utils.RecordAccess;
+
 import java.util.LinkedList;
 import java.util.Vector;
-
-import org.javamrt.utils.RecordAccess;
 
 
 /**
@@ -92,7 +92,6 @@ public class ASPath implements Attribute {
 	}
 	/**
 	 * Append an AS to the ASPATH
-	 * @param as
 	 */
 	public void append(AS as) {
 		add(as);
@@ -100,7 +99,6 @@ public class ASPath implements Attribute {
 
 	/**
 	 * alias of append(AS as)
-	 * @param as
 	 */
 	public void add(AS as) {
 		path.add(as);
@@ -119,23 +117,17 @@ public class ASPath implements Attribute {
 	}
 
 	/**
-	 * @author paag
 	 * @return a Vector with the AS's which are doing prepending.
 	 */
 	public Vector<AS> getPrependers() {
 		return prependers;
 	}
 
-	/**
-	 *
-	 * @return
-	 */
 	public boolean hasAsPathPrepend() {
 		return prependers != null;
 	}
 
 	/**
-	 * @author paag
 	 * rebuild the PREPENDER list
 	 *  <br>Called from decode() or when the AS4PATH attribute is decoded
 	 */
@@ -158,7 +150,6 @@ public class ASPath implements Attribute {
 	/**
 	 * refresh the prependers list when an AS is appended to the ASPATH
 	 * @param ultimo the AS which was appended to the ASPATH
-	 * @author paag
 	 */
 	private void refreshPrependers(AS ultimo) {
 		//
@@ -182,7 +173,7 @@ public class ASPath implements Attribute {
 	}
 
 	/**
-	 * @param as: an AS
+	 * @param as an AS
 	 * @return the index of the first occurrence of AS in the ASPATH
 	 */
 	public int indexOf(AS as) {
@@ -190,7 +181,7 @@ public class ASPath implements Attribute {
 	}
 
 	/**
-	 * @param as: an AS
+	 * @param as an AS
 	 * @return the index of the last occurrence of AS in the ASPATH
 	 */
 	public int lastIndexOf(AS as) {
@@ -201,7 +192,6 @@ public class ASPath implements Attribute {
 		return this.path.indexOf(as) != -1;
 	}
 	/**
-	 * @author paag
 	 * @return a textual representation of the ASPATH
 	 */
 	public String toString() {
@@ -224,9 +214,8 @@ public class ASPath implements Attribute {
 
 	/**
 	 * Shortcut for equals(Object o)
-	 * @param ASPath other: an other ASPath
+	 * @param other an other ASPath
 	 * @return true if both have the same length and all AS's in them are in the same place.
-	 * @author paag
 	 */
 	public boolean equals(ASPath other) {
 		if (this.path.size() != other.path.size())
@@ -241,8 +230,6 @@ public class ASPath implements Attribute {
 
 	/**
 	 * This is the canonical implementation of the equals() method
-	 * @param Object o
-	 * <br>
 	 */
 	public boolean equals(Object o) {
 		if (o == null)
@@ -256,7 +243,7 @@ public class ASPath implements Attribute {
 
 	/**
 	 *
-	 * @param as: as Autonomous System
+	 * @param as as Autonomous System
 	 * @return true if as generated the prefix
 	 */
 	public boolean isGenerator(AS as) {
@@ -276,8 +263,6 @@ public class ASPath implements Attribute {
 	}
 	/**
 	 * Build a copy of the AS_PATH but without prepends
-	 * @param none
-	 * @author paag
 	 */
 
 	public ASPath canonicalPath() {
