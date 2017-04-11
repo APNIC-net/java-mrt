@@ -27,13 +27,12 @@ public class BGPFileReader {
 	private byte[] record;
 
 	private String toString;
-	/*****
-	 *
+
+	/**
 	 * public BGPFileReader (BufferedInputStream in)
 	 *
 	 * create a new BGPFileReader from BufferedInputStream <in>
 	 */
-
 	public BGPFileReader(BufferedInputStream in) {
 		this.in = in;
 		this.toString = in.toString();
