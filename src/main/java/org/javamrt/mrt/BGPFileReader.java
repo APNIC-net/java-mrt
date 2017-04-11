@@ -31,7 +31,7 @@ public class BGPFileReader {
 	/**
 	 * public BGPFileReader (BufferedInputStream in)
 	 *
-	 * create a new BGPFileReader from BufferedInputStream <in>
+	 * create a new BGPFileReader from BufferedInputStream
 	 */
 	public BGPFileReader(BufferedInputStream in) {
 		this.in = in;
