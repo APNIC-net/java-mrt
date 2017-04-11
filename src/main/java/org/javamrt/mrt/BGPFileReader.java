@@ -42,15 +42,13 @@ public class BGPFileReader {
 		this.eof = false;
 	}
 
-	/*****
+	/**
 	 *
 	 * public BGPFileReader (String name)
 	 *
 	 * create a new BGPFileReader from BufferedInputStream specified by the
 	 * String name
-	 * @throws Exception
 	 */
-
 	public BGPFileReader(String name) throws Exception  {
 		InputStream inStream = null;
 		this.toString = name;
@@ -94,9 +92,7 @@ public class BGPFileReader {
 		this.eof = false;
 	}
 
-	/***
-	 * void close()
-	 *
+	/**
 	 * close the BGPFileReader
 	 */
 	public void close() throws java.io.IOException {
@@ -113,14 +109,6 @@ public class BGPFileReader {
 	public String toString() {
 		return this.toString;
 	}
-	/***
-	 *
-	 * MRTRecord readNext()
-	 *
-	 * returns next record on successful completion null on EOF
-	 *
-	 * throws Exception when something goes wrong
-	 */
 
 	private int recordlen = 0;
 	private int type = 0;
