@@ -27,7 +27,7 @@ public class route_btoa {
     public static boolean outputErrToBuilder = false;
     public static StringBuilder errBuilder = new StringBuilder();
     public static boolean callSystemExit = true;
-    
+
 	public static void main(String args[]) {
 		BGPFileReader in;
 		MRTRecord record;
@@ -85,7 +85,7 @@ public class route_btoa {
                 case 'f':
                     outputToFileExt = prueba.optarg;
                     break;
-                
+
 				case 'h':
 				default:
 					exit(usage((opcion) == 'h' ? 0 : 1));
@@ -106,7 +106,7 @@ public class route_btoa {
 		if (args.length == prueba.optind) {
             exit(usage(0));
         }
-        
+
         FileWriter out;
         for (int arg = prueba.optind; arg < args.length; arg++) {
             out = null;
@@ -223,7 +223,7 @@ public class route_btoa {
 		//
 		return originator.equals(mrt.getASPath().generator());
 	}
-    
+
     private static void outputData(String data, FileWriter output) throws IOException {
         if (output != null) {
             output.write(data + System.lineSeparator());
@@ -231,7 +231,7 @@ public class route_btoa {
             System.out.println(data);
         }
     }
-    
+
     public static void exit(int exitCode) {
         if (callSystemExit) {
             System.exit(exitCode);
@@ -242,7 +242,9 @@ public class route_btoa {
         if (outputErrToBuilder) {
             errBuilder.append(str).append(System.lineSeparator());
         } else {
+            System.out.flush();
             System.err.println(str);
+            System.err.flush();
         }
     }
 
