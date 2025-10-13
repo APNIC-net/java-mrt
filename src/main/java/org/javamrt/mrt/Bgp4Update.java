@@ -48,11 +48,13 @@ public class Bgp4Update
 				// this comes from MRTRecord
 				.append(this.updateType).append('|')
 				.append(peerString).append('|')
-				.append(this.peerAS).append('|')
-				.append(this.prefix.toString());
+				.append(this.peerAS);
+
+        if (this.prefix != null)
+            result.append('|').append(this.prefix);
 
 		if (this.updateAttr != null)
-			result.append('|').append(this.updateAttr.toString());
+			result.append('|').append(this.updateAttr);
 
 		return result.toString();
 	}
