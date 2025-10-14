@@ -68,7 +68,7 @@ public class Prefix implements Comparable<Prefix>, Comparator<Prefix> {
 			throw new PrefixMaskException(this.base, this.maskLength);
 		}
 		*/
-        System.arraycopy(addr, 0, this.base, 0, this.mask.length);
+		System.arraycopy(addr, 0, this.base, 0, this.mask.length);
 		for (int n = this.maskLength; n > 0; n--) {
 			for (int i = 0; i < this.mask.length; i++) {
 				byte carry = (byte) (this.mask[i] & 0x01);
@@ -210,17 +210,17 @@ public class Prefix implements Comparable<Prefix>, Comparator<Prefix> {
 		return true;
 	}
 
-    /**
-     * @return number of bytes required to represent this prefix
-     */
-    public int nrBytes() {
-        return maskLength > 0 ? 1 + (maskLength - 1) / 8 : 0;
-    }
+	/**
+	 * @return number of bytes required to represent this prefix
+	 */
+	public int nrBytes() {
+		return maskLength > 0 ? 1 + (maskLength - 1) / 8 : 0;
+	}
 
-    /**
-     * @return the number of bytes needed to represent this prefix, plus one
-     */
-    public int getOffset() {
-        return 1 + nrBytes();
-    }
+	/**
+	 * @return the number of bytes needed to represent this prefix, plus one
+	 */
+	public int getOffset() {
+		return 1 + nrBytes();
+	}
 }

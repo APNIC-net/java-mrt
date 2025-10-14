@@ -25,15 +25,15 @@ import java.util.zip.GZIPInputStream;
 
 public class BGPFileReader implements Closeable {
 	private static final boolean debug = false;
-    private static boolean lenient = false;
+	private static boolean lenient = false;
 
 	private InputStream in;
 	private LinkedList<MRTRecord> recordFifo;
 
-    private boolean eof;
-    public static final byte[] BGP_MARKER = new byte[]{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-    private static final byte[] UNKNOWN_IPV4 = new byte[]{0, 0, 0, 0};
-    private static final byte[] UNKNOWN_IPV6 = new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	private boolean eof;
+	public static final byte[] BGP_MARKER = new byte[]{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+	private static final byte[] UNKNOWN_IPV4 = new byte[]{0, 0, 0, 0};
+	private static final byte[] UNKNOWN_IPV6 = new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	private String streamName;
 	/*****
@@ -59,7 +59,7 @@ public class BGPFileReader implements Closeable {
 	 * @throws IOException
 	 */
 
-	public BGPFileReader(String name) throws IOException  {
+	public BGPFileReader(String name) throws IOException {
 		InputStream inStream = null;
 		this.streamName = name;
 
@@ -75,10 +75,10 @@ public class BGPFileReader implements Closeable {
 
 
 		if (this.streamName.endsWith(".gz")) {
-            this.in = new GZIPInputStream(inStream, 8192);
+			this.in = new GZIPInputStream(inStream, 8192);
 		} else {
-            this.in = (inStream instanceof BufferedInputStream || inStream instanceof GZIPInputStream)
-                ? inStream : new BufferedInputStream(inStream);
+			this.in = (inStream instanceof BufferedInputStream || inStream instanceof GZIPInputStream)
+					  ? inStream : new BufferedInputStream(inStream);
 		}
 
 		this.recordFifo = new LinkedList<MRTRecord>();
@@ -87,11 +87,11 @@ public class BGPFileReader implements Closeable {
 
 	public BGPFileReader(File f) throws IOException {
 		if (!f.exists())
-            throw new java.io.FileNotFoundException(f.toString());
+			throw new java.io.FileNotFoundException(f.toString());
 		FileInputStream inStream = new FileInputStream(f);
-        this.streamName = f.getCanonicalPath();
-        if (this.streamName.endsWith(".gz")) {
-            this.in = new GZIPInputStream(inStream, 8192);
+		this.streamName = f.getCanonicalPath();
+		if (this.streamName.endsWith(".gz")) {
+			this.in = new GZIPInputStream(inStream, 8192);
 		} else {
 			this.in = new BufferedInputStream(inStream);
 		}
@@ -151,14 +151,14 @@ public class BGPFileReader implements Closeable {
 			 * if the queue is empty, read from the file
 			 */
 
-            final byte[] header = new byte[12];
-            byte[] record;
-            int bytesRead;
-            try {
-                bytesRead = readFromInputStream(this.in, header, header.length);
-            } catch (IOException e) {
-                throw new MalformedBgpStreamException(e);
-            }
+			final byte[] header = new byte[12];
+			byte[] record;
+			int bytesRead;
+			try {
+				bytesRead = readFromInputStream(this.in, header, header.length);
+			} catch (IOException e) {
+				throw new MalformedBgpStreamException(e);
+			}
 			/*
 			 * EOF
 			 */
@@ -171,12 +171,12 @@ public class BGPFileReader implements Closeable {
 			 */
 			if (bytesRead != header.length) {
 				this.eof = true;
-                throw new MalformedBgpStreamException(
-                    String.format("Truncated file: %d instead of %d bytes; header: %s",
-                        bytesRead,
-                        header.length, RecordAccess.arrayToString(header)));
+				throw new MalformedBgpStreamException(
+						String.format("Truncated file: %d instead of %d bytes; header: %s",
+						bytesRead,
+						header.length, RecordAccess.arrayToString(header)));
 			}
-            recordCounter ++;
+			recordCounter ++;
 			if (Debug.compileDebug)
 				RecordAccess.dump(Debug.debugStream, header);
 			time = RecordAccess.getU32(header, 0);
@@ -189,30 +189,30 @@ public class BGPFileReader implements Closeable {
 						+ "\n SUBTYPE: " + subtype + "\n RECORDLENGTH: "
 						+ recordlen);
 
-            if (recordlen > Integer.MAX_VALUE) {
-                throw new MalformedBgpStreamException("Can't have a record longer than 2147483647 bytes");
-            }
+			if (recordlen > Integer.MAX_VALUE) {
+				throw new MalformedBgpStreamException("Can't have a record longer than 2147483647 bytes");
+			}
 
-            try {
-                record = new byte[(int) recordlen];
-                bytesRead = readFromInputStream(this.in, record, record.length);
-            } catch (OutOfMemoryError e) {
-                throw new BGPFileReaderException(
-                    "Got OutOfMemoryError while trying to read next record (" + recordlen + " bytes) into memory", header);
-            } catch (IOException e ) {
-                throw new MalformedBgpStreamException(e);
-            }
+			try {
+				record = new byte[(int) recordlen];
+				bytesRead = readFromInputStream(this.in, record, record.length);
+			} catch (OutOfMemoryError e) {
+				throw new BGPFileReaderException(
+						"Got OutOfMemoryError while trying to read next record (" + recordlen + " bytes) into memory", header);
+			} catch (IOException e ) {
+				throw new MalformedBgpStreamException(e);
+			}
 
-            if (bytesRead != record.length) {
-                final String message = String.format("Truncated file: %,d instead of %,d bytes: %s",
-                    bytesRead, record.length, RecordAccess.arrayToString(header));
-                if (lenient) {
-                    route_btoa.System_err_println(message + "; trying to parse anyways");
-                    record = Arrays.copyOf(record, bytesRead);
-                } else {
-                    this.eof = true;
-                    throw new MalformedBgpStreamException(message);
-                }
+			if (bytesRead != record.length) {
+				final String message = String.format("Truncated file: %,d instead of %,d bytes: %s",
+						bytesRead, record.length, RecordAccess.arrayToString(header));
+				if (lenient) {
+					route_btoa.System_err_println(message + "; trying to parse anyways");
+					record = Arrays.copyOf(record, bytesRead);
+				} else {
+					this.eof = true;
+					throw new MalformedBgpStreamException(message);
+				}
 			}
 
 			if (Debug.compileDebug)
@@ -281,7 +281,7 @@ public class BGPFileReader implements Closeable {
 		return ((read == -1 && remaining == length) ? -1 : length - remaining);
 	}
 
-    private MRTRecord parseTableDump(byte[] header, byte[] record, int subtype) throws Exception {
+	private MRTRecord parseTableDump(byte[] header, byte[] record, int subtype) throws Exception {
 		switch (subtype) {
 		case MRTConstants.AFI_IPv4:
 		case MRTConstants.AFI_IPv6:
@@ -293,14 +293,14 @@ public class BGPFileReader implements Closeable {
 
 	}
 
-    private MRTRecord parseBgp(byte[] header, byte[] record, int subtype) throws Exception {
+	private MRTRecord parseBgp(byte[] header, byte[] record, int subtype) throws Exception {
         //Based on https://tools.ietf.org/html/rfc1771
-        //         https://tools.ietf.org/html/rfc6396
+		//         https://tools.ietf.org/html/rfc6396
         switch (subtype) {
-            case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_NULL:
-            case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_PREF_UPDATE:
-            case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_SYNC:
-                return new MRTRecord(header, record);
+			case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_NULL:
+			case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_PREF_UPDATE:
+			case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_SYNC:
+				return new MRTRecord(header, record);
 
             case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_STATE_CHANGE:
                 int offset = 0;
@@ -326,37 +326,37 @@ public class BGPFileReader implements Closeable {
                         MRTConstants.UPDATE_STR_BGP,
                         header,
                         record);
-        }
+		}
 
-        if (subtype >= MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_UPDATE &&
-            subtype <= MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_KEEPALIVE) {
+		if (subtype >= MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_UPDATE &&
+				subtype <= MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_KEEPALIVE) {
 
-            if (record.length < 12) {
-                throw new BGPFileReaderException(
-                    "Not enough bytes to read common BGP fields (at least 12 are needed): ", record);
-            }
-            final AS peerAS = new AS(Arrays.copyOfRange(record, 0, 2));
-            final InetAddress peerIP = InetAddress.getByAddress(Arrays.copyOfRange(record, 2, 6));
-            final AS localAS = new AS(Arrays.copyOfRange(record, 6, 8));
-            final InetAddress localIP = InetAddress.getByAddress(Arrays.copyOfRange(record, 8, 12));
+        	if (record.length < 12) {
+        		throw new BGPFileReaderException(
+        				"Not enough bytes to read common BGP fields (at least 12 are needed): ", record);
+			}
+			final AS peerAS = new AS(Arrays.copyOfRange(record, 0, 2));
+			final InetAddress peerIP = InetAddress.getByAddress(Arrays.copyOfRange(record, 2, 6));
+			final AS localAS = new AS(Arrays.copyOfRange(record, 6, 8));
+			final InetAddress localIP = InetAddress.getByAddress(Arrays.copyOfRange(record, 8, 12));
 
-            switch (subtype) {
-                case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_UPDATE:
-                    return getBgpUpdate(header, record, peerAS, peerIP);
+			switch (subtype) {
+				case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_UPDATE:
+					return getBgpUpdate(header, record, peerAS, peerIP);
 
-                case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_OPEN:
-                    final long bgpId = RecordAccess.getUINT(record, 12 + 5, 4);
-                    return new Open(header, record, peerIP, peerAS, bgpId);
+				case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_OPEN:
+					final long bgpId = RecordAccess.getUINT(record, 12 + 5, 4);
+					return new Open(header, record, peerIP, peerAS, bgpId);
 
-                case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_NOTIFY:
-                    return new Notification(header, record, peerIP, peerAS);
+				case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_NOTIFY:
+					return new Notification(header, record, peerIP, peerAS);
 
-                case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_KEEPALIVE:
-                    return new KeepAlive(header, record, peerAS, peerIP, localAS, localIP);
-            }
-        }
+				case MRTConstants.BGPDUMP_SUBTYPE_MRTD_BGP_KEEPALIVE:
+					return new KeepAlive(header, record, peerAS, peerIP, localAS, localIP);
+			}
+		}
 
-        return new MRTRecord(header, record);
+		return new MRTRecord(header, record);
     }
 
     private MRTRecord getBgpUpdate(byte[] header, byte[] record, AS peerAS, InetAddress peerIP) throws Exception{
@@ -367,59 +367,61 @@ public class BGPFileReader implements Closeable {
         offset += 2;
 
         // WITHDRAWS
-        if (wSize > 0) { // Withdraw if the size > than 0.
+        if(wSize > 0) { // Withdraw if the size > than 0.
             for (int i = 0; i < wSize;) {
-                Prefix prefix = lenient ? new LenientPrefix(record, offset, 1) : new Nlri(record, offset, 1);
+            	Prefix prefix = lenient ? new LenientPrefix(record, offset, 1) : new Nlri(record, offset, 1);
                 offset += prefix.getOffset();
                 i += prefix.getOffset();
 
-                Withdraw withdraw = new Withdraw(header, record, peerIP, peerAS, prefix, MRTConstants.UPDATE_STR_BGP);
+				Withdraw withdraw = new Withdraw(header, record, peerIP, peerAS, prefix, MRTConstants.UPDATE_STR_BGP);
                 recordFifo.add(withdraw);
             }
-        } else { // Advertisments
+        }
+        // Advertisments
 
-            //Reading length of attributes
-            int attrLen = RecordAccess.getU16(record, offset);
-            offset +=2;
+        //Reading length of attributes
+        int attrLen = RecordAccess.getU16(record, offset);
+        offset +=2;
 
-            if (attrLen > 0) {
+		Attributes attributes = null;
+		if(attrLen > 0){
+            try {
+                attributes = new Attributes(record, attrLen, offset,asSize);
+            } catch (RFC4893Exception rfce) {
+                //
+                // piggyback peer and time info
+                //
+                rfce.setTimestamp(this.time);
+                rfce.setPeer(peerIP);
+                rfce.setAS(peerAS);
+                throw rfce;
+            }
 
-                Attributes attributes;
-                try {
-                    attributes = new Attributes(record, attrLen, offset,asSize);
-                } catch (RFC4893Exception rfce) {
-                    //
-                    // piggyback peer and time info
-                    //
-                    rfce.setTimestamp(this.time);
-                    rfce.setPeer(peerIP);
-                    rfce.setAS(peerAS);
-                    throw rfce;
-                }
+            //Process MP_REACH and MP_UNREACH
+            processReachAndUnreach(header, record, attributes, peerIP, peerAS, MRTConstants.UPDATE_STR_BGP);
 
-                //Process MP_REACH and MP_UNREACH
-                processReachAndUnreach(header, record, attributes, peerIP, peerAS, MRTConstants.UPDATE_STR_BGP);
+            offset += attrLen;
+            while (offset < record.length) {
+                Prefix aNlri = lenient ? new LenientPrefix(record, offset, 1) : new Nlri(record, offset, 1);
+                offset += aNlri.getOffset();
 
-                offset += attrLen;
-                while (offset < record.length) {
-                    Prefix aNlri = lenient ? new LenientPrefix(record, offset, 1) : new Nlri(record, offset, 1);
-                    offset += aNlri.getOffset();
-
-                    recordFifo.add(new Advertisement(header, record, peerIP, peerAS,
+                recordFifo.add(new Advertisement(header, record, peerIP, peerAS,
                         aNlri, attributes, MRTConstants.UPDATE_STR_BGP));
-                }
             }
         }
-
-        return recordFifo.remove();
+        if (recordFifo.isEmpty()) {
+            return new EndOfRib(header, record, peerIP, peerAS, attributes, MRTConstants.UPDATE_STR_BGP);
+        } else {
+			return recordFifo.remove();
+		}
     }
 
-    private MRTRecord parseBgp4mp(byte[] header, byte[] record, int subtype) throws Exception {
+	private MRTRecord parseBgp4mp(byte[] header, byte[] record, int subtype) throws Exception {
 		// route_btoa.System_err_println("parseBgp4mp("+MRTConstants.mpSubType(subtype)+")");
 		switch (subtype) {
 		case MRTConstants.BGP4MP_MESSAGE:
 		case MRTConstants.BGP4MP_MESSAGE_AS4:
-            return parseBgp4mpMessage(header, record, (subtype == MRTConstants.BGP4MP_MESSAGE) ? 2 : 4);
+			return parseBgp4mpMessage(header, record, (subtype == MRTConstants.BGP4MP_MESSAGE) ? 2 : 4);
 
 			/*
 			 * TODO
@@ -430,45 +432,45 @@ public class BGPFileReader implements Closeable {
 			 */
 
 		case MRTConstants.BGP4MP_ENTRY:
-            return parseBgp4Entry(header, record, RecordAccess.getU16(record, 6));
+			return parseBgp4Entry(header, record, RecordAccess.getU16(record, 6));
 
 		case MRTConstants.BGP4MP_STATE_CHANGE: {
 			/*
-             *  0                   1                   2                   3
-             *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+			 *  0                   1                   2                   3
+			 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 			 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-             * |         Peer AS Number        |        Local AS Number        |
+			 * |         Peer AS Number        |        Local AS Number        |
 			 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-             * |        Interface Index        |        Address Family         |
+			 * |        Interface Index        |        Address Family         |
 			 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-             * |                      Peer IP Address (variable)               |
+			 * |                      Peer IP Address (variable)               |
 			 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-             * |                      Local IP Address (variable)              |
+			 * |                      Local IP Address (variable)              |
 			 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-             * |            Old State          |          New State            |
+			 * |            Old State          |          New State            |
 			 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 			 */
-            if (record.length < 20) {
-                if (lenient && record.length == 8) {
-                    // seems like known zebra/quagga 8-byte state change bug
-                    route_btoa.System_err_println("8-byte long BGP4MP_STATE_CHANGE; parsing accordingly");
-                    final AS peerAs = new AS(RecordAccess.getBytes(record, 0, 2));
-                    final AS localAs = new AS(RecordAccess.getBytes(record, 2, 2));
-                    int oldState = RecordAccess.getU16(record, 4);
-                    int newState = RecordAccess.getU16(record, 6);
-                    return new StateChange(
-                        RecordAccess.getU32(header, 0),
-                        unknownAddress(MRTConstants.AFI_IPv4),
-                        peerAs,
-                        oldState,
-                        newState,
-                        MRTConstants.UPDATE_STR_BGP4MP,
-                        header,
-                        record);
-                } else {
-                    throw new BGPFileReaderException("BGP4MP state change record smaller than 20 bytes: ", record);
-                }
-            }
+			if (record.length < 20) {
+				if (lenient && record.length == 8) {
+					// seems like known zebra/quagga 8-byte state change bug
+					route_btoa.System_err_println("8-byte long BGP4MP_STATE_CHANGE; parsing accordingly");
+					final AS peerAs = new AS(RecordAccess.getBytes(record, 0, 2));
+					final AS localAs = new AS(RecordAccess.getBytes(record, 2, 2));
+					int oldState = RecordAccess.getU16(record, 4);
+					int newState = RecordAccess.getU16(record, 6);
+					return new StateChange(
+							RecordAccess.getU32(header, 0),
+							unknownAddress(MRTConstants.AFI_IPv4),
+							peerAs,
+							oldState,
+							newState,
+		                    MRTConstants.UPDATE_STR_BGP4MP,
+							header,
+							record);
+				} else {
+					throw new BGPFileReaderException("BGP4MP state change record smaller than 20 bytes: ", record);
+				}
+			}
 			int afi = RecordAccess.getU16(record, 6);
 			int addrOffs = 8;
 			int addrSize = (afi == MRTConstants.AFI_IPv4) ? 4 : 16;
@@ -626,7 +628,7 @@ public class BGPFileReader implements Closeable {
 	private org.javamrt.mrt.AS peerAS[] = null;
 	private java.net.InetAddress peerIP[] = null;
 
-    private void parseTableDumpv2(byte[] header, byte[] record, int nlriType) throws Exception {
+	private void parseTableDumpv2(byte[] header, byte[] record, int nlriType) throws Exception {
 
 		if (Debug.compileDebug) {
 			Debug.printf("parseTableDumpv2(%d)\nheader:", nlriType);
@@ -638,7 +640,7 @@ public class BGPFileReader implements Closeable {
 		int offset = 0;
 		long sequenceNo = RecordAccess.getU32(record, offset);
 		offset = 4;
-        Prefix nlri = lenient ? new LenientPrefix(record, offset, nlriType) : new Nlri(record, offset, nlriType);
+		Prefix nlri = lenient ? new LenientPrefix(record, offset, nlriType) : new Nlri(record, offset, nlriType);
 		offset += nlri.getOffset();
 
 		int entryCount = RecordAccess.getU16(record, offset);
@@ -684,7 +686,7 @@ public class BGPFileReader implements Closeable {
 	}
 
     //Process MP_REACH and MP_UNREACH
-    private void processReachAndUnreach(byte[] header, byte[] record, Attributes attributes, InetAddress srcIP, AS srcAs, String updateStrType) throws Exception{
+	private void processReachAndUnreach(byte[] header, byte[] record, Attributes attributes, InetAddress srcIP, AS srcAs, String updateStrType) throws Exception{
         MpUnReach mpUnreach = (MpUnReach) attributes.getAttribute(MRTConstants.ATTRIBUTE_MP_UNREACH);
 
         if (mpUnreach != null) {
@@ -705,7 +707,7 @@ public class BGPFileReader implements Closeable {
 
     }
 
-    private MRTRecord parseBgp4mpMessage(byte[] header, byte[] record, int asSize) throws Exception {
+	private MRTRecord parseBgp4mpMessage(byte[] header, byte[] record, int asSize) throws Exception {
 	/*
         0                   1                   2                   3
         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -740,36 +742,36 @@ public class BGPFileReader implements Closeable {
                    Figure 13: BGP4MP_MESSAGE_AS4 Subtype
 	*/
 
-        final int markerPosition = lenient ?
-            findBgpMarker(record, asSize) :
-            record.length;
+		final int markerPosition = lenient ?
+								   findBgpMarker(record, asSize) :
+								   record.length;
 
-        final ByteBuffer buffer = ByteBuffer.wrap(record, 0, markerPosition);
+		final ByteBuffer buffer = ByteBuffer.wrap(record, 0, markerPosition);
 
-        AS srcAs = notLenientOr(buffer.remaining() >= asSize) ? new AS(RecordAccess.getUINT(buffer, asSize)) : new AS(0L);
-        AS dstAs = notLenientOr(buffer.remaining() >= asSize) ? new AS(RecordAccess.getUINT(buffer, asSize)) : new AS(0L);
-        int iface = notLenientOr(buffer.remaining() >= 2) ? RecordAccess.getU16(buffer) : 0;
-        int afi = notLenientOr(buffer.remaining() >= 2) ? RecordAccess.getU16(buffer) : 0;
-        if (afi != MRTConstants.AFI_IPv4 && afi != MRTConstants.AFI_IPv6) {
-            final String message = String.format("AFI=%d is unknown", afi);
-            if (lenient) {
-                route_btoa.System_err_println(message + "; assuming IPv4");
-            } else {
-                throw new BGPFileReaderException(message, record);
-            }
-        }
+		AS srcAs = notLenientOr(buffer.remaining() >= asSize) ? new AS(RecordAccess.getUINT(buffer, asSize)) : new AS(0L);
+		AS dstAs = notLenientOr(buffer.remaining() >= asSize) ? new AS(RecordAccess.getUINT(buffer, asSize)) : new AS(0L);
+		int iface = notLenientOr(buffer.remaining() >= 2) ? RecordAccess.getU16(buffer) : 0;
+		int afi = notLenientOr(buffer.remaining() >= 2) ? RecordAccess.getU16(buffer) : 0;
+		if (afi != MRTConstants.AFI_IPv4 && afi != MRTConstants.AFI_IPv6) {
+			final String message = String.format("AFI=%d is unknown", afi);
+			if (lenient) {
+				route_btoa.System_err_println(message + "; assuming IPv4");
+			} else {
+				throw new BGPFileReaderException(message, record);
+			}
+		}
 		int addrSize = (afi == MRTConstants.AFI_IPv6) ? 16 : 4;
 
-        InetAddress srcIP = notLenientOr(buffer.remaining() >= addrSize) ?
-            InetAddress.getByAddress(RecordAccess.getBytes(buffer, addrSize)) :
-            unknownAddress(afi);
-        InetAddress dstIP = notLenientOr(buffer.remaining() >= addrSize) ?
-            InetAddress.getByAddress(RecordAccess.getBytes(buffer, addrSize)) :
-            unknownAddress(afi);
+		InetAddress srcIP = notLenientOr(buffer.remaining() >= addrSize) ?
+							InetAddress.getByAddress(RecordAccess.getBytes(buffer, addrSize)) :
+							unknownAddress(afi);
+		InetAddress dstIP = notLenientOr(buffer.remaining() >= addrSize) ?
+							InetAddress.getByAddress(RecordAccess.getBytes(buffer, addrSize)) :
+							unknownAddress(afi);
 		/*
 		 * skip the following 16 bytes which are the signature of the BGP header
 		 */
-        int offset = buffer.position() + BGP_MARKER.length;
+		int offset = buffer.position() + BGP_MARKER.length;
 
 		int bgpSize = RecordAccess.getU16(record, offset); offset += 2;
 		int bgpType = RecordAccess.getU8(record, offset); offset ++;
@@ -820,26 +822,26 @@ public class BGPFileReader implements Closeable {
 
 		for (int i = 0; i < unfeasibleLen;) {
 			//The withdraws out of the Attributs are going to be always ipv4
-            Prefix wNlri = lenient ? new LenientPrefix(record, offset, 1) : new Nlri(record, offset, 1);
+			Prefix wNlri = lenient ? new LenientPrefix(record, offset, 1) : new Nlri(record, offset, 1);
 			offset += wNlri.getOffset();
 			i += wNlri.getOffset();
 
 			recordFifo
-					.add(new Withdraw(header, record, srcIP, srcAs, wNlri, MRTConstants.UPDATE_STR_BGP4MP));
+					.add(new Withdraw(header, record, srcIP, srcAs, wNlri,MRTConstants.UPDATE_STR_BGP4MP));
 		}
 
 		int attrLen = RecordAccess.getU16(record, offset);
 		if (Debug.compileDebug) Debug.printf("attrLen = %d, offset =%d (%d)\n",attrLen,offset,offset+attrLen+2);
 		offset += 2;
 
-        if (offset + attrLen > record.length) {
-            if (lenient) {
-                route_btoa.System_err_println("Attribute length goes over the record length, truncating");
-                attrLen = record.length - offset;
-            }
-        }
+		if (offset + attrLen > record.length) {
+			if (lenient) {
+				route_btoa.System_err_println("Attribute length goes over the record length, truncating");
+				attrLen = record.length - offset;
+			}
+		}
 
-        Attributes attributes = null;
+		Attributes attributes = null;
 		if (attrLen > 0) {
 			try {
 				attributes = new Attributes(record, attrLen, offset,asSize);
@@ -893,7 +895,7 @@ public class BGPFileReader implements Closeable {
 			if (Debug.compileDebug) Debug.debug("offset(%d) record.length (%d)\n",offset,record.length);
 			while (offset < record.length) {
 				//The announcements out of the Attributs are going to be always ipv4
-                Prefix aNlri = lenient ? new LenientPrefix(record, offset, 1) : new Nlri(record, offset, 1);
+				Prefix aNlri = lenient ? new LenientPrefix(record, offset, 1) : new Nlri(record, offset, 1);
 				offset += aNlri.getOffset();
 
 				recordFifo.add(new Advertisement(header, record, srcIP, srcAs,
@@ -901,56 +903,54 @@ public class BGPFileReader implements Closeable {
 			}
 		}
 		if (recordFifo.isEmpty()) {
-			if (Debug.compileDebug)
-				if (Debug.doDebug)
-					throw new BGPFileReaderException("recordFifo empty!", header);
-			return new Bgp4Update(header, record, srcIP, srcAs, null, attributes, "");
+			return new EndOfRib(header, record, srcIP, srcAs, attributes, MRTConstants.UPDATE_STR_BGP4MP);
+		} else {
+			return recordFifo.remove();
 		}
-		return recordFifo.remove();
 	}
 
-    private InetAddress unknownAddress(int afi) {
-        try {
-            if (afi == MRTConstants.AFI_IPv6) return InetAddress.getByAddress(UNKNOWN_IPV6);
-            else return InetAddress.getByAddress(UNKNOWN_IPV4);
-        } catch (UnknownHostException e) {
-            // should not happen
-            throw new RuntimeException(e);
-        }
-    }
+	private InetAddress unknownAddress(int afi) {
+		try {
+			if (afi == MRTConstants.AFI_IPv6) return InetAddress.getByAddress(UNKNOWN_IPV6);
+			else return InetAddress.getByAddress(UNKNOWN_IPV4);
+		} catch (UnknownHostException e) {
+			// should not happen
+			throw new RuntimeException(e);
+		}
+	}
 
-    private int findBgpMarker(byte[] record, int asSize) throws BGPFileReaderException {
-        final int endOfSearch = record.length - BGP_MARKER.length;
-        if (endOfSearch < 0) {
-            throw new BGPFileReaderException("BGP4MP message is too small: ", record);
-        }
-        final int expectedPositionIpv4 = 2 * asSize + 2 + 2 + 2 * 4;
-        final int expectedPositionIpv6 = 2 * asSize + 2 + 2 + 2 * 16;
+	private int findBgpMarker(byte[] record, int asSize) throws BGPFileReaderException {
+		final int endOfSearch = record.length - BGP_MARKER.length;
+		if (endOfSearch < 0) {
+			throw new BGPFileReaderException("BGP4MP message is too small: ", record);
+		}
+		final int expectedPositionIpv4 = 2 * asSize + 2 + 2 + 2 * 4;
+		final int expectedPositionIpv6 = 2 * asSize + 2 + 2 + 2 * 16;
 
-        if (expectedPositionIpv4 <= endOfSearch && isBgpMarkerAt(record, expectedPositionIpv4)) {
-            return expectedPositionIpv4;
-        } else if (expectedPositionIpv6 <= endOfSearch && isBgpMarkerAt(record, expectedPositionIpv6)) {
-            return expectedPositionIpv6;
-        } else {
-            int i = 0;
-            while (i < endOfSearch) {
-                if (isBgpMarkerAt(record, i)) {
-                    route_btoa.System_err_println(String.format("BGP marker found at offset %d; record re-aligned%n", i));
-                    return i;
-                } else {
-                    i++;
-                }
-            }
-        }
-        throw new BGPFileReaderException("BGP4MP message without BGP marker: ", record);
-    }
+		if (expectedPositionIpv4 <= endOfSearch && isBgpMarkerAt(record, expectedPositionIpv4)) {
+			return expectedPositionIpv4;
+		} else if (expectedPositionIpv6 <= endOfSearch && isBgpMarkerAt(record, expectedPositionIpv6)) {
+			return expectedPositionIpv6;
+		} else {
+			int i = 0;
+			while (i < endOfSearch) {
+				if (isBgpMarkerAt(record, i)) {
+					route_btoa.System_err_println(String.format("BGP marker found at offset %d; record re-aligned%n", i));
+					return i;
+				} else {
+					i++;
+				}
+			}
+		}
+		throw new BGPFileReaderException("BGP4MP message without BGP marker: ", record);
+	}
 
-    private boolean isBgpMarkerAt(byte[] bytes, int offset) {
-        return bytes[offset] == BGP_MARKER[0]
-            && Arrays.equals(Arrays.copyOfRange(bytes, offset, offset + BGP_MARKER.length), BGP_MARKER);
-    }
+	private boolean isBgpMarkerAt(byte[] bytes, int offset) {
+		return bytes[offset] == BGP_MARKER[0]
+				&& Arrays.equals(Arrays.copyOfRange(bytes, offset, offset + BGP_MARKER.length), BGP_MARKER);
+	}
 
-    private MRTRecord parseBgp4Entry(byte[] header, byte[] record, int AFI) throws Exception {
+	private MRTRecord parseBgp4Entry(byte[] header, byte[] record, int AFI) throws Exception {
 		/*
 		 * TODO: this doesn't work as expected yet
 		 */
@@ -979,7 +979,7 @@ public class BGPFileReader implements Closeable {
 		InetAddress nextHop = InetAddress.getByAddress(RecordAccess.getBytes(
 				record, offset, addrSize));
 		offset += addrSize;
-        Prefix prefix = lenient ? new LenientPrefix(record, offset, AFI) : new Nlri(record, offset, AFI);
+		Prefix prefix = lenient ? new LenientPrefix(record, offset, AFI) : new Nlri(record, offset, AFI);
 		offset += prefix.getOffset();
 
 		Attributes attrs = new Attributes(record, record.length - offset,
@@ -1009,16 +1009,16 @@ public class BGPFileReader implements Closeable {
 		return this.eof;
 	}
 
-    public static void setLenient(boolean isLenient) {
-        lenient = isLenient;
-    }
+	public static void setLenient(boolean isLenient) {
+		lenient = isLenient;
+	}
 
-    public static boolean isLenient() {
-        return lenient;
-    }
+	public static boolean isLenient() {
+		return lenient;
+	}
 
-    public static boolean notLenientOr(boolean condition) {
-        return !lenient || condition;
-    }
+	public static boolean notLenientOr(boolean condition) {
+		return !lenient || condition;
+	}
 
 }

@@ -6,6 +6,7 @@
 
 package org.javamrt.mrt;
 
+import org.javamrt.progs.route_btoa;
 import org.javamrt.utils.Debug;
 import org.javamrt.utils.RecordAccess;
 
@@ -21,15 +22,15 @@ public class Attributes {
 		if (attrBytes != 2 && attrBytes != 4)
 			throw new AttributeException(String.format(
 					"Attributes needs attrBytes 2 or 4 (not %d", attrBytes));
-        bytes = new byte[attrLen];
-        System.arraycopy(record, attrPos, bytes, 0, attrLen);
-        decode(bytes, attrLen, attrBytes);
+		bytes = new byte[attrLen];
+		System.arraycopy(record, attrPos, bytes, 0, attrLen);
+		decode(bytes, attrLen, attrBytes);
 	}
 
 	public Attributes(byte[] record, int attrLen, int attrPos) throws Exception {
-        bytes = new byte[attrLen];
-        System.arraycopy(record, attrPos, bytes, 0, attrLen);
-        decode(bytes, attrLen, 2);
+		bytes = new byte[attrLen];
+		System.arraycopy(record, attrPos, bytes, 0, attrLen);
+		decode(bytes, attrLen, 2);
 	}
 
 	public byte[] getBytes() { return bytes; }
@@ -248,13 +249,22 @@ public class Attributes {
 				this.hasASPATHLimit = true;
 				break;
 
-                        case MRTConstants.LARGE_COMMUNITY:
-                                Attribute largeCommunity = new LargeCommunity(buffer);
-                                attributes.set(MRTConstants.ATTRIBUTE_LARGE_COMMUNITY, largeCommunity);
-                                break;
+				case MRTConstants.LARGE_COMMUNITY:
+					if (buffer.length > 0) {
+						Attribute largeCommunity = new LargeCommunity(buffer);
+						attributes.set(MRTConstants.ATTRIBUTE_LARGE_COMMUNITY, largeCommunity);
+					}
+					break;
 
 				default:
-					attributes.set(type, new UnsupportedAttribute(type, buffer));
+					// make sure to not overwrite other attributes in the Vector,
+					// as index in the Vector is not the same as type value
+					if (type > MRTConstants.ATTRIBUTE_LARGE_COMMUNITY && type < MRTConstants.ATTRIBUTE_TOTAL) {
+						final UnsupportedAttribute attribute = new UnsupportedAttribute(type, buffer);
+						attributes.set(type, attribute);
+					} else {
+						route_btoa.System_err_println("Ignoring unknown attribute type " + type);
+					}
 					break;
 			}
 		}
@@ -273,7 +283,7 @@ public class Attributes {
 		if (toStr != null)
 			return toStr;
 
-		toStr = new String();
+		toStr = "";
 
 		for (int i = MRTConstants.ATTRIBUTE_AS_PATH; i <= MRTConstants.ATTRIBUTE_AGGREGATOR; i++) {
 			if (attributes.elementAt(i) != null) {

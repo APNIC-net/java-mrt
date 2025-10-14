@@ -17,8 +17,8 @@ public class LenientPrefix extends Prefix {
         mask = new byte[afi == MRTConstants.AFI_IPv6 ? 16 : 4];
         if (offset + nrBytes() > record.length) {
             throw new ArrayIndexOutOfBoundsException(String.format(
-                "Not enough input bytes (%s) to read NLRI prefix (%d bytes from offset %d)",
-                RecordAccess.arrayToString(record), nrBytes(), offset));
+                    "Not enough input bytes (%s) to read NLRI prefix (%d bytes from offset %d)",
+                    RecordAccess.arrayToString(record), nrBytes(), offset));
         }
         System.arraycopy(record, offset, base, 0, nrBytes());
         isInIpv4EmbeddedIpv6Format = MRTConstants.isInIpv4EmbeddedIpv6Format(this.base);

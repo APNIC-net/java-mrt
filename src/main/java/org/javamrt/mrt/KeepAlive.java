@@ -44,8 +44,8 @@ public class KeepAlive extends MRTRecord {
     @Override
     public String toString() {
         return String.format("KEEP_ALIVE|%d|%s|%s",
-            getTime(), MRTConstants.ipAddressString(peerIp, false), peerAs);
-    }
+   				getTime(), MRTConstants.ipAddressString(peerIp, false), peerAs);
+   	}
 
     @Override
     public boolean equals(Object o) {
@@ -53,10 +53,10 @@ public class KeepAlive extends MRTRecord {
         if (o == null || getClass() != o.getClass()) return false;
         final KeepAlive keepAlive = (KeepAlive) o;
         return getTime() == keepAlive.getTime() &&
-            Objects.equals(peerAs, keepAlive.peerAs) &&
-            Objects.equals(peerIp, keepAlive.peerIp) &&
-            Objects.equals(localAs, keepAlive.localAs) &&
-            Objects.equals(localIp, keepAlive.localIp);
+                Objects.equals(peerAs, keepAlive.peerAs) &&
+                Objects.equals(peerIp, keepAlive.peerIp) &&
+                Objects.equals(localAs, keepAlive.localAs) &&
+                Objects.equals(localIp, keepAlive.localIp);
     }
 
     @Override

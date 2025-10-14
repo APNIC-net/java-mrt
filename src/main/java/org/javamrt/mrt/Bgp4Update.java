@@ -8,6 +8,7 @@ package org.javamrt.mrt;
 
 import java.net.InetAddress;
 import java.util.Comparator;
+import java.util.Objects;
 
 public class Bgp4Update
 	extends MRTRecord
@@ -48,13 +49,11 @@ public class Bgp4Update
 				// this comes from MRTRecord
 				.append(this.updateType).append('|')
 				.append(peerString).append('|')
-				.append(this.peerAS);
-
-        if (this.prefix != null)
-            result.append('|').append(this.prefix);
+				.append(this.peerAS).append('|')
+				.append(this.prefix == null ? "" : this.prefix.toString());
 
 		if (this.updateAttr != null)
-			result.append('|').append(this.updateAttr);
+			result.append('|').append(this.updateAttr.toString());
 
 		return result.toString();
 	}
@@ -72,11 +71,11 @@ public class Bgp4Update
 
 
 	public boolean isIPv4() {
-		return this.prefix.isIPv4();
+		return prefix != null && prefix.isIPv4();
 	}
 
 	public boolean isIPv6() {
-		return this.prefix.isIPv6();
+		return prefix != null && prefix.isIPv6();
 	}
 
 	public Prefix getPrefix() {
@@ -110,12 +109,12 @@ public class Bgp4Update
 	 * Order by prefixes, then by peer and then by time.
 	 */
 	public int compareTo(Bgp4Update other) {
-		int result = this.prefix.compareTo(other.prefix);
+		int result = Objects.compare(this.prefix, other.prefix, Prefix::compareTo);
 		if (result == 0) {
 			result = org.javamrt.utils.InetAddressComparator.compara(this.peerIP,
 					other.peerIP);
 			if (result == 0) {
-				result = Long.valueOf(this.getTime()).compareTo(other.getTime());
+				result = Long.compare(this.getTime(), other.getTime());
 /*
  *  Ignore sorting by update type
  *

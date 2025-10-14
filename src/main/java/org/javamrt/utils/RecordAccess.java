@@ -20,8 +20,8 @@ public class RecordAccess
 
   static public long getUINT (byte[]buffer, int offset,int size) {
     if (offset > buffer.length - size) {
-        throw new ArrayIndexOutOfBoundsException(String.format(
-            "Not enough bytes to read %d bytes from offset %d in %s", size, offset, arrayToString(buffer)));
+      throw new ArrayIndexOutOfBoundsException(String.format(
+              "Not enough bytes to read %d bytes from offset %d in %s", size, offset, arrayToString(buffer)));
     }
     return new BigInteger(1, Arrays.copyOfRange(buffer, offset, offset + size)).longValue();
   }
@@ -29,7 +29,7 @@ public class RecordAccess
   static public int getU16 (byte[]buffer, int offset)
   {
     if (offset > buffer.length - 2) {
-        throw new ArrayIndexOutOfBoundsException("Not enough bytes to read U16 from offset " + offset + " in " + arrayToString(buffer));
+      throw new ArrayIndexOutOfBoundsException("Not enough bytes to read U16 from offset " + offset + " in " + arrayToString(buffer));
     }
     return ((buffer[offset] & 0xff) << 8) | (buffer[offset+1] & 0xff);
   }
@@ -42,21 +42,22 @@ public class RecordAccess
   static public byte[] getBytes (byte[]buffer, int offset, int length)
   {
     if (buffer.length < offset + length) {
-        throw new ArrayIndexOutOfBoundsException(String.format(
-            "Not enough bytes to read %d bytes from offset %d in %s", length, offset, arrayToString(buffer)));
+      throw new ArrayIndexOutOfBoundsException(String.format(
+              "Not enough bytes to read %d bytes from offset %d in %s", length, offset, arrayToString(buffer)));
     }
     return Arrays.copyOfRange(buffer, offset, offset + length);
   }
 
   static public String arrayToString(byte[] buffer)
   {
-      final int offset = Math.max(0, buffer.length - 128);
-      return arrayToString(buffer, offset, buffer.length - offset);
+    final int offset = Math.max(0, buffer.length - 128);
+    return arrayToString(buffer, offset, buffer.length - offset);
   }
 
   static public String arrayToString(byte[] buffer,int offset,int len)
   {
     StringBuilder result = new StringBuilder();
+
 
     for (int i=offset - (offset % 8);i < offset+len;i++)
       {
@@ -94,7 +95,7 @@ public class RecordAccess
 
   static public void dump(java.io.PrintStream out,byte[] buffer)
   {
-    out.printf("buffer is %d bytes long", buffer.length);
+      out.printf("buffer is %d bytes long", buffer.length);
     out.print(arrayToString(buffer,0,buffer.length));
   }
 
@@ -118,5 +119,4 @@ public class RecordAccess
     buffer.get(bytes);
     return bytes;
   }
-
 }

@@ -25,7 +25,7 @@ public class Community implements Attribute {
 
 	public Community(byte[] buffer) {
 		community = new byte[buffer.length];
-        System.arraycopy(buffer, 0, community, 0, buffer.length);
+		System.arraycopy(buffer, 0, community, 0, buffer.length);
 	}
 
 	public static Community empty() {
@@ -33,11 +33,11 @@ public class Community implements Attribute {
 	}
 
 	public String toString() {
-		return toStringBuffer(community).toString();
+		return toStringBuilder(community).toString();
 	}
 
-	private static StringBuffer toStringBuffer(byte[] buffer) {
-		StringBuffer result = new StringBuffer();
+	private static StringBuilder toStringBuilder(byte[] buffer) {
+		StringBuilder result = new StringBuilder();
 
 		if (null != buffer) {
 			int len = buffer.length;
@@ -67,7 +67,7 @@ public class Community implements Attribute {
 	}
 
 	public boolean equals(Community other) {
-        return Arrays.equals(this.community, other.community);
+		return Arrays.equals(this.community, other.community);
 	}
 
 	public boolean equals(Object o) {

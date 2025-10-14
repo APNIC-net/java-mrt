@@ -123,13 +123,13 @@ public class MRTConstants {
 	public static final int BGP4MSG_REFRESH = 5;
 
 	public static final int BGPDUMP_TYPE_MRTD_BGP = 5;
-    public static final int BGPDUMP_SUBTYPE_MRTD_BGP_NULL= 0;
+	public static final int BGPDUMP_SUBTYPE_MRTD_BGP_NULL= 0;
 	public static final int BGPDUMP_SUBTYPE_MRTD_BGP_UPDATE= 1;
-    public static final int BGPDUMP_SUBTYPE_MRTD_BGP_PREF_UPDATE= 2;
+	public static final int BGPDUMP_SUBTYPE_MRTD_BGP_PREF_UPDATE= 2;
 	public static final int BGPDUMP_SUBTYPE_MRTD_BGP_STATE_CHANGE = 3;
-    public static final int BGPDUMP_SUBTYPE_MRTD_BGP_SYNC = 4;
-    public static final int BGPDUMP_SUBTYPE_MRTD_BGP_OPEN = 5;
-    public static final int BGPDUMP_SUBTYPE_MRTD_BGP_NOTIFY = 6;
+	public static final int BGPDUMP_SUBTYPE_MRTD_BGP_SYNC = 4;
+	public static final int BGPDUMP_SUBTYPE_MRTD_BGP_OPEN = 5;
+	public static final int BGPDUMP_SUBTYPE_MRTD_BGP_NOTIFY = 6;
 	public static final int BGPDUMP_SUBTYPE_MRTD_BGP_KEEPALIVE = 7;
 
 	public static final String UPDATE_STR_BGP4MP = "BGP4MP";
@@ -173,7 +173,7 @@ public class MRTConstants {
 		"BGP4MSG_REFRESH"
 	};
 
-	public static final String bgpType(int bgpType) {
+	public static String bgpType(int bgpType) {
 		try {
 			return bgpTypes[bgpType];
 		} catch (Exception e) {
@@ -219,8 +219,8 @@ public class MRTConstants {
 			if (ia instanceof Inet6Address && ((Inet6Address)ia).isIPv4CompatibleAddress()) {
 				return true;
 			}
-		} catch(UnknownHostException e) {
-		    throw new RuntimeException(e);
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
 		}
 		return false;
 	}
@@ -235,6 +235,7 @@ public class MRTConstants {
 	 * for all addresses, removes initial name
 	 */
 	public static String ipAddressString(InetAddress inetAddress, boolean isIpv4EmbeddedIpv6) {
+	    if (inetAddress == null) return "";
 
 		String ipAddressString = inetAddress.getHostAddress();
 		try {
@@ -251,19 +252,19 @@ public class MRTConstants {
 
 			if (ipAddressString.equals(":"))
 				ipAddressString = "::";
-		} catch(UnknownHostException e){
-            throw new RuntimeException(e);
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
 		}
 
 		return ipAddressString;
 	}
 
-	public static String ipAddressString(byte[] ipAddressBase, boolean isIpv4EmbeddedIpv6){
-		try {
-			return ipAddressString(InetAddress.getByAddress(ipAddressBase), isIpv4EmbeddedIpv6);
-		} catch(UnknownHostException e){
-			e.printStackTrace();
-			return "??/";
-		}
-	}
+    public static String ipAddressString(byte[] ipAddressBase, boolean isIpv4EmbeddedIpv6) {
+        try {
+            return ipAddressString(InetAddress.getByAddress(ipAddressBase), isIpv4EmbeddedIpv6);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            return "??/";
+        }
+    }
 }
