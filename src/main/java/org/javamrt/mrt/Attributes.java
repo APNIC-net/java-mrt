@@ -6,11 +6,11 @@
 
 package org.javamrt.mrt;
 
+import org.javamrt.progs.route_btoa;
 import org.javamrt.utils.Debug;
 import org.javamrt.utils.RecordAccess;
 
 import java.net.InetAddress;
-import java.util.Arrays;
 import java.util.Vector;
 
 public class Attributes {
@@ -22,25 +22,27 @@ public class Attributes {
 		if (attrBytes != 2 && attrBytes != 4)
 			throw new AttributeException(String.format(
 					"Attributes needs attrBytes 2 or 4 (not %d", attrBytes));
-		decode(record, attrLen, attrPos, attrBytes);
-		bytes = Arrays.copyOfRange(record, attrPos, attrPos + attrLen);
+		bytes = new byte[attrLen];
+		System.arraycopy(record, attrPos, bytes, 0, attrLen);
+		decode(bytes, attrLen, attrBytes);
 	}
 
 	public Attributes(byte[] record, int attrLen, int attrPos) throws Exception {
-		decode(record, attrLen, attrPos, 2);
-		bytes = Arrays.copyOfRange(record, attrPos, attrPos + attrLen);
+		bytes = new byte[attrLen];
+		System.arraycopy(record, attrPos, bytes, 0, attrLen);
+		decode(bytes, attrLen, 2);
 	}
 
 	public byte[] getBytes() { return bytes; }
 
-	private void decode(byte[] record, int attrLen, int attrPos, int attrBytes)
+	private void decode(byte[] record, int attrLen, int attrBytes)
 			throws Exception {
 		byte[] buffer;
 
-		int here = attrPos;
+		int here = 0;
 
 		if (Debug.compileDebug)
-			Debug.printf("Attributes(...,%d,%d,%d)\n", attrLen, attrPos,
+			Debug.printf("Attributes(...,%d,%d,%d)\n", attrLen, 0,
 					attrBytes);
 
 		attributes = new Vector<Attribute>(MRTConstants.ATTRIBUTE_TOTAL);
@@ -51,7 +53,7 @@ public class Attributes {
 			else
 				attributes.addElement(null);
 
-		while (here < attrLen + attrPos) {
+		while (here < attrLen) {
 
 			int flag = RecordAccess.getU8(record, here);
 			int type = RecordAccess.getU8(record, here + 1);
@@ -247,13 +249,22 @@ public class Attributes {
 				this.hasASPATHLimit = true;
 				break;
 
-                        case MRTConstants.LARGE_COMMUNITY:
-                                Attribute largeCommunity = new LargeCommunity(buffer);
-                                attributes.set(MRTConstants.ATTRIBUTE_LARGE_COMMUNITY, largeCommunity);
-                                break;
+				case MRTConstants.LARGE_COMMUNITY:
+					if (buffer.length > 0) {
+						Attribute largeCommunity = new LargeCommunity(buffer);
+						attributes.set(MRTConstants.ATTRIBUTE_LARGE_COMMUNITY, largeCommunity);
+					}
+					break;
 
 				default:
-					attributes.set(type, new UnsupportedAttribute(type, buffer));
+					// make sure to not overwrite other attributes in the Vector,
+					// as index in the Vector is not the same as type value
+					if (type > MRTConstants.ATTRIBUTE_LARGE_COMMUNITY && type < MRTConstants.ATTRIBUTE_TOTAL) {
+						final UnsupportedAttribute attribute = new UnsupportedAttribute(type, buffer);
+						attributes.set(type, attribute);
+					} else {
+						route_btoa.System_err_println("Ignoring unknown attribute type " + type);
+					}
 					break;
 			}
 		}
@@ -272,7 +283,7 @@ public class Attributes {
 		if (toStr != null)
 			return toStr;
 
-		toStr = new String();
+		toStr = "";
 
 		for (int i = MRTConstants.ATTRIBUTE_AS_PATH; i <= MRTConstants.ATTRIBUTE_AGGREGATOR; i++) {
 			if (attributes.elementAt(i) != null) {
